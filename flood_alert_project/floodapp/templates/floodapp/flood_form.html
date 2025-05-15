@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Flood Alert System</title>
+    {% load static %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="{% static 'floodapp/styles.css' %}">
+</head>
+
+<body>
+    <div class="container">
+        <h2 class="text-center">Flood Alert</h2><h5 class="text-center">Location Based Form</h5>
+
+        <form class="text-center" method="post" id="locationForm"><br>
+            {% csrf_token %}
+
+            <button type="button" class="btn btn-primary" onclick="getLocationAndSubmit()">Use My Live Location</button>
+<br>
+            <input type="hidden" name="lat" id="lat">
+            <input type="hidden" name="lon" id="lon">
+
+            <br>
+            <h5>OR</h5><br>
+
+            <h2><label>Enter City or Name:</label><br></h2><br>
+            <div class="mb-3">
+                <input type="text" name="manual_location" class="form-control" placeholder="e.g., Mysore or 12.2958,76.6394"><br>
+            </div>
+            <button type="submit" class="btn btn-primary" >Submit Manually</button>
+
+        </form>
+<br><br>
+        {% if message %}
+        <h3 class="text-center">{{ message }}</h3>
+        {% endif %}<br>
+        {% if lat and lon %}
+        <p class="text-center"><strong>Latitude:</strong> {{ lat }}</p>
+        <p class="text-center"><strong>Longitude:</strong> {{ lon }}</p>
+        {% endif %}
+
+    </div>
+    {% if weather %}
+    <h3>Weather Details</h3>
+    {% if weather.error %}
+    <p>Error: {{ weather.error }}</p>
+    {% else %}
+    <ul>
+        <li><strong>Condition:</strong> {{ weather.condition }} ({{ weather.description }})</li>
+        <li><strong>Temperature:</strong> {{ weather.temperature }} °C</li>
+        <li><strong>Humidity:</strong> {{ weather.humidity }}%</li>
+        <li><strong>Wind Speed:</strong> {{ weather.wind_speed }} m/s</li>
+        <li><strong>Rain (Last 1h):</strong> {{ weather.rain_1h }} mm</li>
+        <li><strong>Rain (Next 3h):</strong> {{ weather.rain_3h }} mm</li>
+        <li><strong>Rain (Next 6h):</strong> {{ weather.rain_6h }} mm</li>
+        <li><strong>Rain (Next 24h):</strong> {{ weather.rain_24h }} mm</li>
+    </ul>
+    {% endif %}
+    {% endif %}
+    {% if average_rainfall is not None %}
+    <h3>Average Rainfall (Last 7 Days): {{ average_rainfall }} mm</h3>
+    {% else %}
+    {% endif %}
+
+
+
+    <script>
+        function getLocationAndSubmit() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    document.getElementById("lat").value = position.coords.latitude;
+                    document.getElementById("lon").value = position.coords.longitude;
+                    document.getElementById("locationForm").submit();
+                }, function (error) {
+                    alert("Error getting location: " + error.message);
+                });
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+
+    </script>
+</body>
+
+</html>
