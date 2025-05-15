@@ -1,0 +1,23 @@
+<!-- templates/home.html -->
+{% extends "floodapp/base.html" %}
+
+{% block title %}Home | Flood Alert{% endblock %}
+
+{% block content %}
+<div class="container text-center mt-5">
+    {% load static %}
+    
+    <!-- Logo with tight bottom margin -->
+    <img src="{% static 'floodapp/plogo.png' %}" 
+         class="rounded-circle mb-0" 
+         alt="Logo" 
+         style="width: 300px; height: 300px; object-fit: cover;">
+
+    <!-- Title immediately below logo -->
+    <h2 class="mt-1 mb-2">Welcome to the Flood Alert System</h2>
+    <p class="mb-3">Get real-time and historical rainfall data with alerts.</p>
+
+    <!-- Button -->
+    <a href="{% url 'flood_form' %}" class="btn btn-primary">Go to Alert Form</a>
+</div>
+{% endblock %}

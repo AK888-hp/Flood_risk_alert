@@ -4,12 +4,14 @@ from django.shortcuts import render
 from geopy.geocoders import Nominatim
 from django.conf import settings
 
+def home(request):
+    return render(request, 'floodapp/home.html')
+
 def fetch_nasa_power_rainfall_avg(lat, lon, days=7):
     end_date = datetime.utcnow().date() - timedelta(days=2)
     start_date = end_date - timedelta(days=days - 1)
     start_str = start_date.strftime("%Y%m%d")
     end_str = end_date.strftime("%Y%m%d")
-
 
     url = (
         f"https://power.larc.nasa.gov/api/temporal/daily/point"
@@ -26,8 +28,6 @@ def fetch_nasa_power_rainfall_avg(lat, lon, days=7):
         response = requests.get(url)
         data = response.json()
         rainfall_dict = data.get('properties', {}).get('parameter', {}).get('PRECTOTCORR', {})
-
-        print("Rainfall dict:", rainfall_dict)  # Debug
 
         valid_rainfall = [v for v in rainfall_dict.values() if v not in (-999, -999.0)]
 
@@ -74,16 +74,21 @@ def location_submit_view(request):
 
         if lat and lon:
             try:
-                # Convert to float to avoid any string issues
                 lat = float(lat)
                 lon = float(lon)
 
                 # Get current weather
-                current_url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={settings.OPENWEATHER_API_KEY}&units=metric"
+                current_url = (
+                    f"https://api.openweathermap.org/data/2.5/weather"
+                    f"?lat={lat}&lon={lon}&appid={settings.OPENWEATHER_API_KEY}&units=metric"
+                )
                 current_res = requests.get(current_url).json()
 
                 # Forecast
-                forecast_url = f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={settings.OPENWEATHER_API_KEY}&units=metric"
+                forecast_url = (
+                    f"https://api.openweathermap.org/data/2.5/forecast"
+                    f"?lat={lat}&lon={lon}&appid={settings.OPENWEATHER_API_KEY}&units=metric"
+                )
                 forecast_res = requests.get(forecast_url).json()
                 forecast_list = forecast_res.get("list", [])
 
@@ -103,7 +108,6 @@ def location_submit_view(request):
                     "rain_24h": rain_24h,
                 }
 
-                # Get average rainfall from NASA
                 average_rainfall = fetch_nasa_power_rainfall_avg(lat, lon, days=7)
 
             except Exception as e:
