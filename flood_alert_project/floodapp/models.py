@@ -1,7 +1,13 @@
 from django.db import models
 
-# Create your models here.
-from django.db import models
+class FloodDataRecord(models.Model):
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    average_rainfall = models.FloatField()
+    temperature = models.FloatField()
+    humidity = models.FloatField()
+    flood_occurred = models.BooleanField()
+    created_at = models.DateTimeField(auto_now_add=True)
 
 class LocationSubmission(models.Model):
     latitude = models.FloatField()
@@ -10,10 +16,10 @@ class LocationSubmission(models.Model):
 
     def __str__(self):
         return f"{self.latitude}, {self.longitude} @ {self.timestamp}"
-    
-class HistoricalRainfall(models.Model):
-    date = models.DateField()
-    rainfall_mm = models.FloatField()
+    class HistoricalRainfall(models.Model):
+     location_name = models.CharField(max_length=100)
+     date = models.DateField()
+     rainfall_mm = models.FloatField()
 
-    def __str__(self):
-        return f"{self.date} - {self.rainfall_mm} mm"
+     def __str__(self):
+        return f"{self.location_name} - {self.date} - {self.rainfall_mm}mm"
